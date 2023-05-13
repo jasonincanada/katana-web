@@ -1,0 +1,45 @@
+﻿@model Katana.ViewModels.AccountDetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1 class="display-5">@Html.DisplayFor(model => model.Account.Name)</h1>
+
+@if (Model.Account.BoundTo != null)
+{
+    <p>Bound to: <katana envelope="Model.Account.BoundTo"></katana></p>
+}
+
+<br/>
+<div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Note</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in Model.RegisterReport)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(z => line.Date)</td>
+                            <td>@Html.DisplayFor(z => line.Note)</td>
+                            <td><katana amount="line.Amount"></katana></td>
+                            <td><katana amount="line.Balance"></katana></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Account.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

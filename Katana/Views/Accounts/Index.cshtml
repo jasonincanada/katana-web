@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Katana.ViewModels.AccountIndexViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="display-5">Accounts</h1>
+
+<p>
+    <a asp-action="Create">Add another account</a>
+</p>
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Account.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Balance)</th>
+            <th>@Html.DisplayNameFor(model => model.Account.BoundTo)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var vm in Model) {
+        <tr>
+            <td><katana account="vm.Account"></katana></td>
+            <td><katana amount="vm.Balance"></katana></td>
+            <td>
+                @if (vm.Account?.BoundTo != null) {
+                    <katana envelope="vm.Account?.BoundTo"></katana>
+                }
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@vm.Account?.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@vm.Account?.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@vm.Account?.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

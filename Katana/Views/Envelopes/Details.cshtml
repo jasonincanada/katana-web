@@ -1,0 +1,266 @@
+﻿@using System.Diagnostics;
+@model Katana.ViewModels.EnvelopeDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Envelope.Name;
+}
+
+<div>
+    <a asp-action="Index">&lt; All envelopes</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Envelope.Id">Edit this envelope</a>
+</div>
+
+<br/>
+
+<h1 class="display-5">
+    @Html.DisplayFor(vm => vm.Envelope.Name)
+
+    @if (Model.IsAvailableEnvelope) {
+        <span class="amount" style="color: yellowgreen">$@Html.DisplayFor(z => Model.AvailableFunds)</span>
+
+        if (Model.AvailableFunds > 0) {
+            <a class="btn btn-secondary" id="button-stash" asp-action="Stash">Stash</a>
+        }
+    } else {
+        <span class="amount">$@Html.DisplayFor(z => Model.FundsInEnvelope)</span>
+    }
+</h1>
+
+<div class="row envelope-summary-row" style="background-color: @Model.Envelope.HexColor">
+    
+    @if (Model.IsAvailableEnvelope)
+    {
+        <div class="col">
+            <dl>
+                <dt>Total inflow:</dt>
+                <dd>$@Html.DisplayFor(z => Model.TotalInflow)</dd>
+            </dl>
+            <dl>
+                <dt>Net stashed:</dt>
+                <dd>$@Html.DisplayFor(z => Model.NetStashed)</dd>
+            </dl>
+            <dl>
+                <dt>Funds still in envelope:</dt>
+                <dd>$@Html.DisplayFor(z => Model.AvailableFunds)</dd>
+            </dl>
+        </div>
+    }
+    else
+    {
+        <div class="col">
+            <dl>
+                <dt>Net stashed:</dt>
+                <dd>$@Html.DisplayFor(z => Model.NetStashed)</dd>
+            </dl>
+            <dl>
+                <dt>Total spending:</dt>
+                <dd>$@Html.DisplayFor(z => Model.SpendingTotal)</dd>
+            </dl>
+            <dl>
+                <dt>Funds still in envelope:</dt>
+                <dd>
+                    $@Html.DisplayFor(z => Model.FundsInEnvelope)
+
+                    @if (Model.IsUnfundedSpending) {
+                        <a asp-action="Stash" asp-controller="Envelopes" class="unfunded-spending">
+                            Fund this spending
+                        </a>
+                    }
+                </dd>
+            </dl>
+        </div>
+    }
+
+    @if (Model.IsAvailableEnvelope)
+    {
+        <div class="col">
+            <p>This envelope holds your newly earned dollars while you decide which envelopes to stash them in.
+                Any inflow to an account that starts with <b>assets</b> is placed into this envelope for you.
+            </p>
+
+            @if (Model.AvailableFunds > 0)
+            {
+                <p>You still have <b>$@Html.DisplayFor(av => av.AvailableFunds)</b> to stash. It's good to set aside
+                   your money ahead of time, so make sure this envelope is empty as often as possible.
+                </p>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="col">
+            <h2>Plan</h2>
+            <dl class="to-be-implemented">
+                <dt>Funding target:</dt>
+                <dd>$400</dd>
+                <dt>By:</dt>
+                <dd>End of month</dd>
+            </dl>
+        </div>
+    }
+
+    @if (!Model.IsAvailableEnvelope)
+    {
+        <div class="col">
+            <h2>Bound Accounts</h2>
+            <ul>
+               @foreach (var account in Model.BoundAccounts) {
+                    <li><katana account="account"></katana></li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+<div class="row">
+    <div class="col">
+        <h2>Stashing</h2>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">To / From</th>
+                    <th scope="col">Envelope</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+           @foreach (var stash in Model.Stashes)
+            {
+                if (stash.From == Model.Envelope)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(z => stash.Date)</td>
+                        <td>To</td>
+                        <td><katana envelope="stash.To"></katana></td>
+                        <td>-<katana amount="stash.Amount"></katana></td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(z => stash.Date)</td>
+                        <td>From</td>
+                        <td><katana envelope="stash.From"></katana></td>
+                        <td>+<katana amount="stash.Amount"></katana></td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+       @if (Model.IsAvailableEnvelope)
+        {
+            <h2>Inflow</h2>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Inflow Account</th>
+                        <th scope="col">Note</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+               @foreach (var entry in Model.InflowEntries)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(z => entry.Date)</td>
+                        <td><katana account="entry.Entry.Account"></katana></td>
+                        <td>@Html.DisplayFor(z => entry.Note)</td>
+                        <td>+<katana amount="entry.Entry.Amount"></katana></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h2>Spending</h2>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">From</th>
+                        @if (Model.IsAvailableEnvelope)
+                        {
+                            <th scope="col">Inflow Account</th>
+                        }
+                        else
+                        {
+                            <th scope="col">Expense Account</th>
+                        }
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+               @foreach (var transaction in Model.Transactions)
+                {
+                    if (transaction.Entries.Count() == 2)
+                    {
+                        var expense = transaction.Entries.First(e => e.Account.BoundTo == Model.Envelope);
+                        var other   = transaction.Entries.First(e => e != expense);
+
+                        <tr>
+                            <td>@Html.DisplayFor(z => transaction.Date)</td>
+                            <td><katana account="other.Account"></katana></td>
+                            <td><katana account="expense.Account"></katana></td>
+                            <td>-<katana amount="expense.Amount"></katana></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        Debug.Assert( transaction.Entries.Count() > 2 );
+
+                        var boundEntries = transaction.Entries
+                                                      .Where(e => e.Account.BoundTo == Model.Envelope);
+
+                        foreach (var expense in boundEntries)
+                        {
+                            var others = expense.Amount > 0
+                                ? transaction.Entries.Where(entry => entry != expense)
+                                                     .Where(entry => entry.Amount < 0)
+                                                     .ToList()
+                                : transaction.Entries.Where(entry => entry != expense)
+                                                     .Where(entry => entry.Amount > 0)
+                                                     .ToList();
+
+                            if (others.Count > 1)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(z => transaction.Date)</td>
+                                    <td><span class="multiple">multiple</span></td>
+                                    <td><katana account="expense.Account"></katana></td>
+                                    <td>-<katana amount="expense.Amount"></katana></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(z => transaction.Date)</td>
+                                    <td><katana account="others.First().Account"></katana></td>
+                                    <td><katana account="expense.Account"></katana></td>
+                                    <td>-<katana amount="expense.Amount"></katana></td>
+                                </tr>
+                            }
+                        }
+                    }
+                }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<style type="text/css">
+    .unfunded-spending {
+        display: inline-block;
+        margin-left: 10px;
+        background-color: dodgerblue;
+        padding: 2px 8px;
+        border-radius: 5px;
+        color: white;
+        font-size: .8em;
+    }
+</style>

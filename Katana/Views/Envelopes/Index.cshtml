@@ -1,0 +1,54 @@
+﻿@model List<Katana.ViewModels.EnvelopeIndexViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="display-5">Envelopes</h1>
+
+<p><a asp-action="Create">Add another envelope</a></p>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Still in Envelope</th>
+            <th>Spent</th>
+            <th>Stashed</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model) {
+            <tr style="background-color: @row.Envelope.HexColor;">
+                
+                <td>
+                    <katana envelope="row.Envelope"></katana>
+
+                   @if (row.IsAvailableEnvelope && row.AmountInEnvelope > 0) {
+                        <a class="btn btn-secondary" asp-action="Stash" style="margin-left: 10px;">Stash</a>
+                    }
+                </td>
+
+               @if (row.IsAvailableEnvelope)
+                {
+                    <td><katana amount="row.AmountInEnvelope"></katana></td>
+                    <td></td>
+                    <td></td>
+                }
+                else
+                {
+                    <td><katana amount="row.AmountInEnvelope"></katana></td>
+                    <td><katana amount="row.TotalBoundSpending"></katana></td>
+                    <td><katana amount="row.Envelope.Amount"></katana></td>
+                }
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@row.Envelope.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@row.Envelope.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@row.Envelope.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

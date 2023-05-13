@@ -1,0 +1,27 @@
+﻿@model Katana.ViewModels.TransactionImportViewModel
+
+@{
+    ViewData["Title"] = "Import Transaction";
+}
+
+<h1>Import</h1>
+
+<p>Type or paste the ledger-formatted transaction(s) here:</p>
+
+<form asp-controller="Transactions" asp-action="ProcessImport" method="post">
+    <div class="form-group">
+        <label for="LedgerText">Import Data:</label>
+        <textarea asp-for="LedgerText"
+                  class="form-control"
+                  id="LedgerText"
+                  name="LedgerText"
+                  rows="15"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('LedgerText').focus();
+    });
+</script>

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Katana", "Katana\Katana.csproj", "{966C0A93-5B78-4706-AEFD-A823FF73FC5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Tests", "Katana.Tests\Katana.Tests.csproj", "{95AA1C49-038A-412C-B979-57F3C56C6A5D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{966C0A93-5B78-4706-AEFD-A823FF73FC5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{966C0A93-5B78-4706-AEFD-A823FF73FC5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{966C0A93-5B78-4706-AEFD-A823FF73FC5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{966C0A93-5B78-4706-AEFD-A823FF73FC5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95AA1C49-038A-412C-B979-57F3C56C6A5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95AA1C49-038A-412C-B979-57F3C56C6A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95AA1C49-038A-412C-B979-57F3C56C6A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95AA1C49-038A-412C-B979-57F3C56C6A5D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D19E6FF5-BCC3-4C39-ACDF-A965955D8068}
+	EndGlobalSection
+EndGlobal

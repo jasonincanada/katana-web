@@ -1,0 +1,223 @@
+﻿@model Katana.ViewModels.StashViewModel
+
+@{
+    ViewData["Title"] = "Stash";
+}
+
+<h1 class="display-5">Stash Funds</h1>
+<br />
+
+<form asp-controller="Envelopes" asp-action="ProcessStash" class="form" method="post">
+    <button type="submit"
+            class="btn btn-primary"
+            style="float: right;">
+        Save Stashes
+    </button>
+    
+    <big>
+        <b>Started with</b>: <span style="margin-right: 20px;">$@Html.DisplayFor(z => Model.Available)</span>
+           <b>Remaining</b>: $ <input asp-for="Available" disabled="disabled" class="Stashing" />
+    </big>
+
+    <br/>
+    <br/>
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Envelope</th>
+                <th>Quick Amounts</th>
+                <th>Stashing</th>
+                <th>New Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+           @for (int i = 0; i < Model.Rows.Count; i++)
+            {
+                var envelope = Model.Rows[i].Envelope;
+
+                <tr class="envelope-row" style="background-color: @envelope.HexColor;">
+                    <td>
+                        <input type="hidden" asp-for="Rows[i].Envelope.Id" />
+                        <input type="hidden" asp-for="Rows[i].Envelope.Name" />
+                        <input type="hidden" asp-for="Rows[i].NewAmount" />
+
+                        <katana envelope="envelope" target="_blank"></katana>
+                    </td>
+                    <td>
+                        <a class="btn stashable-amount" onclick="addStash(@i, 100)">100</a>
+                        <a class="btn stashable-amount" onclick="addStash(@i, 50)">50</a>
+                        <a class="btn stashable-amount" onclick="addStash(@i, 10)">10</a>
+                        <a class="btn stashable-amount" onclick="addStash(@i, 1)">1</a>
+                        <span class="divider">|</span>
+                        <a class="btn stashable-amount" onclick="addStashAll(@i)">All</a>
+                        <a class="btn stashable-amount" onclick="addStashExactly(@i)">+</a>
+                    </td>
+                    <td>
+                        <input type="text" class="Stashing" readonly asp-for="Rows[i].Stashing" />
+                        <a class="btn btn-undo btn-undo-disabled" onclick="undoIndex(@i)">Undo</a>
+                    </td>
+                    <td>
+                        <label id="newAmount-@i"><katana amount="Model.Rows[i].NewAmount"></katana></label>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+
+<style type="text/css">
+    tr.envelope-row a.btn {
+        background-color: lightgray;
+        border-radius: 3px;
+        color: black;
+        font-size: .7em;
+        padding: 2px 5px;
+        margin-left: 3px;
+        margin-right: 3px;
+        min-width: 40px;
+    }
+
+    tr.envelope-row .btn-undo.btn-undo-disabled {
+        background-color: white;
+        color: lightgray;
+    }
+
+    tr.envelope-row a.btn:hover {
+        background-color: yellowgreen;
+        color: white;
+    }
+
+    tr.envelope-row:hover {
+        background-color: #F3F3F3;
+    }
+
+    tr.envelope-row a.not-enough-available {
+        background-color: white;
+        color: lightgray;
+        border-color: lightgray;
+    }
+    
+    tr.envelope-row a.not-enough-available:hover {
+        background-color: lightgray;
+        color: white;
+    }
+
+    input[type="text"].Stashing {
+        border-radius: 5px;
+        padding-left: 8px;
+        background-color: #F3F3F3;
+        border: 0px;
+    }
+
+    input[type="text"].Stashing.positive {
+        background-color: yellowgreen;
+        color: white;
+    }
+
+    .divider {
+        color: lightgray;
+    }
+
+</style>
+
+<script type="text/javascript">
+
+    document.addEventListener('DOMContentLoaded', function () {
+        refreshUI();
+    });
+
+    function refreshUI() {
+        disableUnstashableAmounts();
+        disableUndoButton();
+        greenStashing();
+    }
+
+    function disableUnstashableAmounts() {
+        const available = parseFloat($('#Available').val());
+
+        $('a.stashable-amount').each(function () {
+            const amount = parseFloat($(this).text());
+            const isNotEnoughAvailable = available <= 0 || amount > available;
+
+            $(this).toggleClass('not-enough-available', isNotEnoughAvailable);
+        });
+    }
+
+    function disableUndoButton() {
+        $('a.btn-undo').each(function() {
+            const stashed = $(this).siblings('.Stashing').first().val();
+            $(this).toggleClass('btn-undo-disabled', parseFloat(stashed) <= 0);
+        });
+    }
+
+    function greenStashing() {
+        $('.Stashing').each(function () {
+            const $this = $(this);
+            const isPositive = $this.val() > 0;
+            $this.toggleClass('positive', isPositive);
+        });
+    }
+
+    function addStash(index, amount) {
+        const available = parseFloat($('#Available').val());
+        const stashing  = parseFloat($(`#Rows_${index}__Stashing`).val());
+        const newAmount = parseFloat($(`#Rows_${index}__NewAmount`).val());
+
+        if (available - amount < 0) {
+            return;
+        }
+
+        const newAvailable = Math.round((available - amount) * 100) / 100;
+        const newStashing  = Math.round((stashing + amount) * 100) / 100;
+        const newNewAmount = Math.round((newAmount + newStashing) * 100) / 100;
+
+        $('#Available').val(newAvailable);
+        $(`#Rows_${index}__Stashing`).val(newStashing);
+        $(`#newAmount-${index}`).text(newNewAmount);
+       
+        refreshUI();
+
+        return false;
+    }
+
+    function addStashAll(index) {
+        const available = parseFloat($('#Available').val());
+
+        if (available <= 0) {
+            return false;
+        }
+
+        addStash(index, available);
+        return false;
+    }
+
+    function addStashExactly(index) {
+        const available = parseFloat($('#Available').val());
+        let amount = window.prompt("Enter an exact amount up to " + available, "0.00");
+
+        if (amount === null || isNaN(parseFloat(amount))) {
+            return false;
+        }
+
+        amount = parseFloat(amount);
+
+        if (amount <= 0) {
+            return false;
+        }
+
+        if (amount > available) {
+            amount = available;
+        }
+
+        addStash(index, amount);
+        return false;
+    }
+
+    function undoIndex(index) {
+        const stashing = parseFloat($(`#Rows_${index}__Stashing`).val());
+        addStash(index, -stashing);
+        return false;
+    }
+    
+</script>
