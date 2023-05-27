@@ -4,3 +4,5 @@ obj/
 *.suo
 *.lock
 *.vsidx
+.vs/
+*.swp
