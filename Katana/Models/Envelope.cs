@@ -27,7 +27,7 @@ public class Envelope
     {
         return new Envelope
         {
-            Id = 1,
+            Id = SpecialEnvelope.Available,
             Name = "✉️ Available"
         };
     }
