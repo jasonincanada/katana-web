@@ -122,11 +122,12 @@ namespace Katana.Controllers
             {
                 Account = account,
                 SelectedEnvelopeID = account.BoundTo?.Id ?? 0,
-                Envelopes = envelopes.Select(envelope => new SelectListItem
-                {
-                    Value = envelope.Id.ToString(),
-                    Text = envelope.Name
-                })
+                Envelopes = envelopes.OrderBy(e => e.Name)
+                                     .Select(envelope => new SelectListItem
+                                     {
+                                         Value = envelope.Id.ToString(),
+                                         Text = envelope.Name
+                                     })
             };
 
             return View(viewModel);
@@ -146,13 +147,24 @@ namespace Katana.Controllers
             {
                 try
                 {
+                    var account = _store.GetAccount(id);
+
+                    if (account == null)
+                        return NotFound();
+
+                    account.Name = vm.Account.Name;
+
                     if (vm.SelectedEnvelopeID > 0)
                     {
                         var envelope = _context.Envelopes.Find(vm.SelectedEnvelopeID);
-                        vm.Account.BoundTo = envelope;
-                        _context.Update(vm.Account);
+                        account.BoundTo = envelope;
                     }
-                    
+                    else
+                    {
+                        account.BoundTo = null;
+                    }
+
+                    _context.Update(account);
                     _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)

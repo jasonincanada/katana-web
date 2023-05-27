@@ -21,7 +21,7 @@
                 <div class="col-4"><label asp-for="SelectedEnvelopeID" class="control-label"></label></div>
                 <div class="col-8">
                     <select asp-for="SelectedEnvelopeID" asp-items="@(new SelectList(Model.Envelopes, "Value", "Text"))">
-                        <option value="">-- Select Envelope --</option>
+                        <option value="0">-- Select Envelope --</option>
                     </select>
                     <span asp-validation-for="Account.Name" class="text-danger"></span>
                 </div>
