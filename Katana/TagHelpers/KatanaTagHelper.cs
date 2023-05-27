@@ -1,4 +1,5 @@
 ﻿using Katana.Models;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Katana.TagHelpers
@@ -18,6 +19,8 @@ namespace Katana.TagHelpers
         public Account Account { get; set; }
         public Envelope Envelope { get; set; }
 
+        public bool HighlightNegatives { get; set; }
+
         public decimal? Amount { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -27,16 +30,18 @@ namespace Katana.TagHelpers
             else if (Amount != null)
             {
                 output.TagName = "span";
+                output.AddClass("amount");
+
+                if (Amount.Value < 0 && HighlightNegatives)
+                    output.AddClass("negative-amount");
 
                 if (Amount.Value == 0)
                 {
-                    output.Attributes.SetAttribute("class", "amount zero-amount");
+                    output.AddClass("zero-amount");
                     output.Content.SetContent("--");
                 }
                 else
                 {
-                    output.Attributes.SetAttribute("class", "amount");
-
                     string s = string.Format("{0:N2}", (decimal)Amount.Value);
 
                     string[] split = s.Split('.');
@@ -64,7 +69,7 @@ namespace Katana.TagHelpers
             output.Content.SetContent(content);
         }
 
-        private static void AddClass(TagHelperOutput output, string @class)
+        public static void AddClass(this TagHelperOutput output, string @class)
         {
             var existingClass = output.Attributes.FirstOrDefault(a => a.Name == "class");
             if (existingClass != null)

@@ -29,6 +29,17 @@ tr a.btn {
     font-size: .8em;
 }
 
+a.btn-cover-all-unfunded-spending {
+    float: right;    
+    color: #CCC;
+}
+
+a.btn-cover-all-unfunded-spending:hover {
+    background-color: indianred;
+    border: 1px solid indianred;;
+    color: white;
+}
+
 /* TODO: colors for statuses
 .envelope {
     border: 1px solid #CCC;
@@ -81,6 +92,23 @@ h1 .amount {
     display: inline-block;    
     text-align: right;
     min-width: 80px;
+}
+
+.negative-amount {
+    color: white;
+    background-color: indianred;
+    border-radius: 3px;
+    padding: 2px;
+    padding-right: 5px;
+}
+
+.negative-amount .segment-cents {
+    color: lightgray;
+}
+
+.amount-sign {
+    display: inline-block;
+    width: 12px;
 }
 
 span.multiple {
